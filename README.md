@@ -17,9 +17,9 @@ KIHUMURO DORIS	24/U/05810/PS
 INSTRUCTIONS ON HOW TO VIEW/ RUN THE PROJECT
 	Download or clone the repository from GitHub
 	Open the project folder
-	Locate the index.html file
+    Locate the index.html file
 	Double click the file using any web browser
-  The application will load and be ready for use
+    The application will load and be ready for use
 	
 
 
