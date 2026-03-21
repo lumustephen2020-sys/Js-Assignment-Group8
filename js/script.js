@@ -21,7 +21,7 @@ const products = [
         name: "Classic Sneakers",
         price: 110000, 
         category: "Fashion",
-        image: "images/pexels-zaktech90-1027130.jpg", 
+        image: "images/download.jpg", 
         description: "Comfortable Shoes"
     },
     {
