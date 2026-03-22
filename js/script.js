@@ -1,4 +1,4 @@
-// Product Data - Prices directly in UGX with local images
+// My products list - I put all the items I'm selling here
 const products = [
     {
         id: 1,
@@ -50,89 +50,111 @@ const products = [
     }
 ];
 
-// Global variables
-let cart = [];
-let currentCategory = 'all';
-let searchTerm = '';
+// These are my global variables - I use them everywhere in my code
+let cart = []; // This will hold all the items the user adds to cart
+let currentCategory = 'all'; // This tracks which category filter is active
+let searchTerm = ''; // This tracks what the user is searching for
 
-// Format price in UGX
+// This function helps me show prices with UGX currency format
 function formatUGX(amount) {
+    // I learned this from Google - it adds commas to big numbers
     return 'UGX ' + amount.toLocaleString('en-UG');
 }
 
-// Initialize based on current page
+// This runs when the page loads - I check which page we're on
 document.addEventListener('DOMContentLoaded', () => {
     try {
+        // First I load any saved cart items from localStorage
         loadCart();
         
+        // Update the little number that shows how many items are in cart
         updateCartCount();
+        
+        // I need to know which page the user is on
         const currentPage = window.location.pathname;
         
+        // Different pages need different setup
         if (currentPage.includes('cart.html')) {
-            // Cart page specific
+            // If we're on cart page, show cart items
             initializeCartPage();
         } else if (currentPage.includes('checkout.html')) {
-            // Checkout page specific
+            // If we're on checkout page, setup checkout
             initializeCheckoutPage();
         } else {
-            // Home page (index.html)
+            // Otherwise we must be on home page
             initializeHomePage();
         }
     } catch (error) {
+        // If something breaks, show error message
         console.error('Error initializing app:', error);
         showErrorMessage('Failed to load page. Please refresh.');
     }
 });
 
-//  HOME PAGE FUNCTIONS
+//  HOME PAGE FUNCTIONS - This is for the main shop page
 function initializeHomePage() {
+    // Show all products when page loads
     displayProducts(products);
+    // Set up all the buttons and search box
     setupHomePageListeners();
 }
 
 function setupHomePageListeners() {
-    // Search functionality
+    // Get the search input and button from the page
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
     
+    // When user types in search box, I update the search term
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            searchTerm = e.target.value.toLowerCase();
-            filterProducts();
+            searchTerm = e.target.value.toLowerCase(); // Make everything lowercase so search works better
+            filterProducts(); // Show only matching products
         });
     }
     
+    // When user clicks search button, filter products
     if (searchBtn) {
         searchBtn.addEventListener('click', () => filterProducts());
     }
     
-    // Category filter buttons
+    // Get all the category filter buttons
     const categoryButtons = document.querySelectorAll('.category-btn');
     categoryButtons.forEach(button => {
         button.addEventListener('click', (e) => {
+            // Remove active class from all buttons first
             categoryButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to the button that was clicked
             e.target.classList.add('active');
+            // Update current category based on what was clicked
             currentCategory = e.target.dataset.category;
+            // Show products for this category
             filterProducts();
         });
     });
 }
 
+// This function actually puts products on the screen
 function displayProducts(productsToDisplay) {
+    // Find the container where products go
     const container = document.getElementById('products-container');
-    if (!container) return;
+    if (!container) return; // If no container, stop the function
     
+    // Clear whatever was there before
     container.innerHTML = '';
     
+    // If no products to show, show a message
     if (productsToDisplay.length === 0) {
         container.innerHTML = '<div class="empty-products"><p>No products found.</p></div>';
         return;
     }
     
+    // Loop through each product and create HTML for it
     productsToDisplay.forEach(product => {
+        // Create a card for each product
         const card = document.createElement('div');
         card.className = 'product-card';
         
+        // Put all the product info inside the card
         card.innerHTML = `
             <img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.src='images/placeholder.jpg'">
             <div class="product-info">
@@ -143,22 +165,27 @@ function displayProducts(productsToDisplay) {
             </div>
         `;
         
-        // Add event listener to the button
+        // I need to make the Add to Cart button work
         const addBtn = card.querySelector('.add-to-cart-btn');
         addBtn.addEventListener('click', () => addToCart(product));
         
+        // Add the card to the container
         container.appendChild(card);
     });
 }
 
+// This function filters products based on category and search
 function filterProducts() {
     try {
+        // Start with all products
         let filtered = products;
         
+        // If category isn't 'all', filter by category
         if (currentCategory !== 'all') {
             filtered = filtered.filter(product => product.category === currentCategory);
         }
         
+        // If there's a search term, filter by name or description
         if (searchTerm) {
             filtered = filtered.filter(product => 
                 product.name.toLowerCase().includes(searchTerm) ||
@@ -166,17 +193,19 @@ function filterProducts() {
             );
         }
         
+        // Show the filtered products
         displayProducts(filtered);
     } catch (error) {
         console.error('Error filtering products:', error);
     }
 }
 
-//  CART FUNCTIONS 
+//  CART FUNCTIONS - These manage the shopping cart
 function loadCart() {
     try {
+        // Try to get saved cart from browser's localStorage
         const savedCart = localStorage.getItem('cart');
-        cart = savedCart ? JSON.parse(savedCart) : [];
+        cart = savedCart ? JSON.parse(savedCart) : []; // If nothing saved, start with empty cart
     } catch (error) {
         console.error('Error loading cart:', error);
         cart = [];
@@ -185,7 +214,9 @@ function loadCart() {
 
 function saveCart() {
     try {
+        // Save current cart to localStorage so it doesn't disappear
         localStorage.setItem('cart', JSON.stringify(cart));
+        // Update the cart count display
         updateCartCount();
     } catch (error) {
         console.error('Error saving cart:', error);
@@ -193,21 +224,28 @@ function saveCart() {
 }
 
 function updateCartCount() {
+    // Find all elements that show cart count (there might be multiple)
     const cartCountElements = document.querySelectorAll('#cart-count');
+    // Calculate total number of items (sum of all quantities)
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     
+    // Update each element with the total
     cartCountElements.forEach(element => {
         if (element) element.textContent = totalItems;
     });
 }
 
+// This adds a product to the cart
 function addToCart(product) {
     try {
+        // Check if product is already in cart
         const existingItem = cart.find(item => item.id === product.id);
         
         if (existingItem) {
+            // If it's already there, just increase quantity by 1
             existingItem.quantity += 1;
         } else {
+            // If it's new, add it with quantity 1
             cart.push({
                 id: product.id,
                 name: product.name,
@@ -217,7 +255,9 @@ function addToCart(product) {
             });
         }
         
+        // Save the updated cart
         saveCart();
+        // Tell user it worked
         alert(`${product.name} added to cart!`);
     } catch (error) {
         console.error('Error adding to cart:', error);
@@ -225,19 +265,23 @@ function addToCart(product) {
     }
 }
 
-// ============= CART PAGE FUNCTIONS =============
+//  CART PAGE FUNCTIONS - For the shopping cart page
 function initializeCartPage() {
+    // Show all items in cart when page loads
     displayCartItems();
 }
 
 function displayCartItems() {
+    // Find the container for cart items
     const cartContainer = document.getElementById('cart-container');
     const summaryContainer = document.getElementById('cart-summary');
     
     if (!cartContainer) return;
     
+    // Clear whatever was there before
     cartContainer.innerHTML = '';
     
+    // If cart is empty, show a message
     if (cart.length === 0) {
         cartContainer.innerHTML = `
             <div class="empty-cart">
@@ -251,6 +295,7 @@ function displayCartItems() {
     
     let subtotal = 0;
     
+    // Loop through each item in cart and show it
     cart.forEach(item => {
         const itemTotal = item.price * item.quantity;
         subtotal += itemTotal;
@@ -277,9 +322,11 @@ function displayCartItems() {
         cartContainer.appendChild(cartItem);
     });
     
+    // Calculate tax and total
     const tax = subtotal * 0.1;
     const total = subtotal + tax;
     
+    // Show the order summary with totals
     if (summaryContainer) {
         summaryContainer.innerHTML = `
             <h3>Order Summary</h3>
@@ -300,15 +347,19 @@ function displayCartItems() {
     }
 }
 
-// Make these functions global so onclick attributes can access them
+// I had to make these global so the buttons in HTML can call them
 window.updateQuantity = function(productId, change) {
     try {
+        // Find the item in cart
         const item = cart.find(item => item.id === productId);
         if (item) {
+            // Change quantity by +1 or -1
             item.quantity += change;
+            // If quantity becomes 0 or less, remove the item
             if (item.quantity <= 0) {
                 cart = cart.filter(item => item.id !== productId);
             }
+            // Save changes and refresh display
             saveCart();
             displayCartItems();
         }
@@ -320,7 +371,9 @@ window.updateQuantity = function(productId, change) {
 
 window.removeFromCart = function(productId) {
     try {
+        // Remove item from cart
         cart = cart.filter(item => item.id !== productId);
+        // Save changes and refresh display
         saveCart();
         displayCartItems();
     } catch (error) {
@@ -331,14 +384,18 @@ window.removeFromCart = function(productId) {
 
 // ============= CHECKOUT PAGE FUNCTIONS =============
 function initializeCheckoutPage() {
+    // Show cart summary on checkout page
     displayCheckoutSummary();
+    // Set up the checkout form validation
     setupCheckoutForm();
 }
 
 function displayCheckoutSummary() {
+    // Find the container for checkout summary
     const container = document.getElementById('checkout-cart-summary');
     if (!container) return;
     
+    // Calculate total again
     let subtotal = 0;
     cart.forEach(item => {
         subtotal += item.price * item.quantity;
@@ -347,6 +404,7 @@ function displayCheckoutSummary() {
     const tax = subtotal * 0.1;
     const total = subtotal + tax;
     
+    // Show order summary with quantities and totals
     container.innerHTML = `
         <h3>Order Summary</h3>
         <div class="summary-row">
@@ -369,21 +427,27 @@ function displayCheckoutSummary() {
 }
 
 function setupCheckoutForm() {
+    // Find the checkout form
     const form = document.getElementById('checkout-form');
     if (!form) return;
     
+    // When user submits form, validate and process order
     form.addEventListener('submit', (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Stop form from actually submitting
         
         try {
             if (validateCheckoutForm()) {
+                // Make sure cart isn't empty
                 if (cart.length === 0) {
                     throw new Error('Your cart is empty. Please add items before checkout.');
                 }
                 
+                // If everything is okay, show success message
                 alert('Order placed successfully! Thank you for shopping with us.');
+                // Clear the cart
                 cart = [];
                 saveCart();
+                // Go back to home page
                 window.location.href = 'index.html';
             }
         } catch (error) {
@@ -391,6 +455,7 @@ function setupCheckoutForm() {
         }
     });
     
+    // Setup clear cart button if it exists
     const clearCartBtn = document.getElementById('clear-cart-btn');
     if (clearCartBtn) {
         clearCartBtn.addEventListener('click', () => {
@@ -398,19 +463,21 @@ function setupCheckoutForm() {
                 cart = [];
                 saveCart();
                 displayCheckoutSummary();
-                displayCartItems(); // If on cart page
+                displayCartItems(); // If we're on cart page, refresh that too
             }
         });
     }
 }
 
+// This function checks if all form fields are filled correctly
 function validateCheckoutForm() {
+    // Get all the form fields
     const name = document.getElementById('name');
     const email = document.getElementById('email');
     const phone = document.getElementById('phone');
     const address = document.getElementById('address');
     
-    // Clear previous errors
+    // Clear any previous error messages
     document.getElementById('name-error').textContent = '';
     document.getElementById('email-error').textContent = '';
     document.getElementById('phone-error').textContent = '';
@@ -418,11 +485,13 @@ function validateCheckoutForm() {
     
     let isValid = true;
     
+    // Check if name is filled
     if (!name.value.trim()) {
         document.getElementById('name-error').textContent = 'Name is required';
         isValid = false;
     }
     
+    // Check if email is filled and looks like an email
     if (!email.value.trim()) {
         document.getElementById('email-error').textContent = 'Email is required';
         isValid = false;
@@ -431,6 +500,7 @@ function validateCheckoutForm() {
         isValid = false;
     }
     
+    // Check if phone is filled and long enough
     if (!phone.value.trim()) {
         document.getElementById('phone-error').textContent = 'Phone is required';
         isValid = false;
@@ -439,6 +509,7 @@ function validateCheckoutForm() {
         isValid = false;
     }
     
+    // Check if address is filled
     if (!address.value.trim()) {
         document.getElementById('address-error').textContent = 'Address is required';
         isValid = false;
@@ -447,7 +518,9 @@ function validateCheckoutForm() {
     return isValid;
 }
 
+// This shows an error message on the page if something goes wrong
 function showErrorMessage(message) {
+    // Try to show error in different containers
     const containers = ['products-container', 'cart-container', 'checkout-cart-summary'];
     containers.forEach(id => {
         const container = document.getElementById(id);
