@@ -7,18 +7,23 @@
     <link rel="stylesheet" href="CSS/style.css">
 </head>
 <body>
+ main
     <header>
         <div class="header-container">
             <h1>🛍️ Shoppers</h1>
-            <nav>
+            <nav aria-label="Main navigation">
                 <ul>
-                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="index.html" class="active" aria-current="page">Home</a></li>
                     <li><a href="cart.html">Cart <span id="cart-count" class="cart-badge">0</span></a></li>
                     <li><a href="checkout.html">Checkout</a></li>
                 </ul>
             </nav>
+        <div class ="header-search">
+        <input type="search"placeholder="search products">
+        <button type="submit">search</button>
         </div>
-    </header>
+        </div>
+      </header>
 
     <main>
         <section class="filters-section">
