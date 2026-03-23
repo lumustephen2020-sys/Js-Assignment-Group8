@@ -47,7 +47,55 @@ const products = [
         category: "Books",
         image: "Images/python.jpg", 
         description: "Build beautiful websites"
-    }
+    },
+    {
+    id: 7,
+    name: "Gaming Laptop",
+    price: 2000000,
+    category: "Electronics",
+    image: "Images/Gaming laptop.webp",
+    description: "High performance gaming laptop"
+},
+{
+    id: 8,
+    name: "Digital Camera",
+    price: 850000,
+    category: "Electronics",
+    image: "Images/camera.webp",
+    description: "Capture high-quality photos"
+},
+{
+    id: 9,
+    name: "Wireless Earbuds",
+    price: 95000,
+    category: "Electronics",
+    image: "Images/earbuds.jpg",
+    description: "Clear sound wireless earbuds"
+},
+{
+    id: 10,
+    name: "Power Bank",
+    price: 70000,
+    category: "Electronics",
+    image: "Images/powerbank.webp",
+    description: "Portable fast charging power bank"
+},
+{
+    id: 11,
+    name: "Smart Watch",
+    price: 180000,
+    category: "Electronics",
+    image: "Images/smart watch.webp",
+    description: "Track fitness and notifications"
+},
+{
+    id: 12,
+    name: "Jeans",
+    price: 85000,
+    category: "Fashion",
+    image: "Images/jeans.jpg",
+    description: "Stylish and comfortable jeans"
+}
 ];
 
 // These are my global variables - I use them everywhere in my code
